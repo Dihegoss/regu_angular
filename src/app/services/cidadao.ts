@@ -24,17 +24,9 @@ export class CidadaoService {
 
   constructor(private http: HttpClient) { }
 
-  buscarCidadao(cpf?: string, atendimento?: string): Observable<Cidadao[]> {
-    let params: any = {};
-    
-    if (cpf) {
-      params.cpf = cpf;
-    }
-    
-    if (atendimento) {
-      params.atendimento = atendimento;
-    }
-
-    return this.http.get<Cidadao[]>(`${this.apiUrl}/cidadao`, { params });
+  buscarCidadao(cpf: string): Observable<Cidadao[]> {
+    return this.http.get<Cidadao[]>(`${this.apiUrl}/cidadao`, { 
+      params: { cpf } 
+    });
   }
 }

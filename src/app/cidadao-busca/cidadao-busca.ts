@@ -11,7 +11,6 @@ import { CidadaoService, Cidadao } from '../services/cidadao';
   styleUrl: './cidadao-busca.scss'
 })
 export class CidadaoBuscaComponent {
-  atendimento: string = '';
   cpf: string = '';
   cidadaos: Cidadao[] = [];
   loading: boolean = false;
@@ -20,8 +19,8 @@ export class CidadaoBuscaComponent {
   constructor(private cidadaoService: CidadaoService) {}
 
   pesquisar(): void {
-    if (!this.atendimento && !this.cpf) {
-      this.error = 'Por favor, preencha pelo menos um campo (Atendimento ou CPF)';
+    if (!this.cpf) {
+      this.error = 'Por favor, preencha o campo CPF';
       return;
     }
 
@@ -29,7 +28,7 @@ export class CidadaoBuscaComponent {
     this.error = '';
     this.cidadaos = [];
 
-    this.cidadaoService.buscarCidadao(this.cpf, this.atendimento).subscribe({
+    this.cidadaoService.buscarCidadao(this.cpf).subscribe({
       next: (data) => {
         this.cidadaos = data;
         this.loading = false;
@@ -46,7 +45,6 @@ export class CidadaoBuscaComponent {
   }
 
   limpar(): void {
-    this.atendimento = '';
     this.cpf = '';
     this.cidadaos = [];
     this.error = '';

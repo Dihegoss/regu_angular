@@ -33,17 +33,17 @@ async function initialize() {
 
 // API para buscar dados do cidadão
 app.get('/api/cidadao', async (req, res) => {
-  const { cpf, atendimento } = req.query;
+  const { cpf } = req.query;
   
-  if (!cpf && !atendimento) {
-    return res.status(400).json({ error: 'CPF ou Atendimento é obrigatório' });
+  if (!cpf) {
+    return res.status(400).json({ error: 'CPF é obrigatório' });
   }
 
   let connection;
   try {
     connection = await oracledb.getConnection();
     
-    let query = `
+    const query = `
       SELECT tc.nm_cidadao, tc.nr_cpf, tc.nr_cep, tc.ds_logradouro as rua, 
              tc.nr_lote, tc.ds_bairro, tc.cd_uf, uf.nm_uf as Estado, 
              m.descr_munic, tl.cd_tipo_fone, tl.nr_telefone
@@ -51,22 +51,10 @@ app.get('/api/cidadao', async (req, res) => {
       LEFT JOIN dbamvfor.municipio m ON m.id_munic = tc.cd_municipio_resid
       INNER JOIN dbamvfor.uf uf ON uf.cd_uf = tc.cd_uf
       INNER JOIN dbamvfor.tb_telefone tl ON tl.cd_cidadao = tc.cd_cidadao
-      WHERE 1=1
+      WHERE tc.nr_cpf = :cpf
     `;
-    
-    const binds = [];
-    
-    if (cpf) {
-      query += ` AND tc.nr_cpf = :cpf`;
-      binds.push(cpf);
-    }
-    
-    if (atendimento) {
-      query += ` AND tc.cd_cidadao = :atendimento`;
-      binds.push(atendimento);
-    }
 
-    const result = await connection.execute(query, binds, {
+    const result = await connection.execute(query, [cpf], {
       outFormat: oracledb.OUT_FORMAT_OBJECT
     });
 
